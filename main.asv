@@ -1,0 +1,236 @@
+% Author: K******
+	clc; close all; clear;
+	disp('-------------------------------------------------------------------------');
+    disp('Author: K******');
+    disp('-------------------------------------------------------------------------');
+
+% Task 1: Load the image & modify it
+    disp('-------------------------------------------------------------------------');
+    disp('Task 1: Load the image & modify it');
+    IMAGE = load ('zzp3100.txt');
+    [m,n] = size(IMAGE);
+    
+        %Deleting the first and last 6 rows&cols of IMAGE matrix
+            IMAGE([1 2 3 4 5 6 m-5 m-4 m-3 m-2 m-1 m],:)=[];
+            IMAGE(:,[1 2 3 4 5 6 n-5 n-4 n-3 n-2 n-1 n])=[];
+            [m,n]=size(IMAGE);
+            
+        %Displaying the number of rows&cols and pixels on the screen
+            NumberOfPixels=m*n;
+            newsize=size(IMAGE);
+            fprintf('The modified image has %2.0f rows & %2.0f cols\n',newsize)
+            fprintf('which is a total of %4.0f pixels.\n',NumberOfPixels)
+                
+% Task 2: Plot the working image as a surface plot in gray scale
+    disp('-------------------------------------------------------------------------');
+    disp('Task 2: Plot the working image as a surface plot in gray scale');
+    disp('See figure 1, press any key to continue');
+    
+    surf(IMAGE);
+    figure_1 = surf(IMAGE);
+    colormap gray;
+    colorbar;
+    shading interp;
+    view(0,90);
+    grid on;
+    box off;
+    whitebg=('white');
+    title('Figure 1');
+    xlabel('C o l u m n s');
+    ylabel('R o w s');
+    pause;
+   
+% Task 3: Calculate the standard deviation of the modified image
+    disp('-------------------------------------------------------------------------');
+    disp('Task 3: Calculate the standard deviation of the modified image');
+    %Turning image into a single column vector
+    newImage=IMAGE(:);
+    %Calculating standard deviation
+    SD=std(newImage,0,1);
+    %Calculating the average standard deviation
+    [m,n]=size(SD);
+    newSD=(sum(SD))/(m*n);
+    fprintf('The standard deviation of the overall modified image is %8.4f\n',newSD)
+        
+    
+% Task 4: Find the % of the modified image >= std
+    disp('-------------------------------------------------------------------------');
+    disp('Task 4: Find the % of the modified image >= std');
+    %finding the number of greater topography values > std
+        C=newImage>newSD;
+        numBigValues=sum(C);
+    %finding percentage > std
+        perBigValues=numBigValues/(length(newImage))*100;
+    %output the result
+    fprintf('The %% of modified image that has values > std is %6.4f%%\n',perBigValues)
+        
+    
+% Task 5: Find the % of the modified image < std
+    disp('-------------------------------------------------------------------------');
+    disp('Task 5: Find the % of the modified image < std');
+    %finding the number of greater topography values < std
+        D=newImage<newSD;
+        numSmallValues=sum(D);
+    %finding percentage < std
+        perSmallValues=numSmallValues/(length(newImage))*100;
+    %output the result
+    fprintf('The %% of modified image that has values < std is %6.4f%%\n',perSmallValues)
+    
+
+% Task 6: Find the max&min of the column stds & where they occur
+    disp('-------------------------------------------------------------------------');
+    disp('Task 6: Find the max&min of the column stds & where they occur');
+    %finding the column std
+    ColSD=std(IMAGE,0,1);
+    %min&max column stds
+    [minCx,minCk]=min(ColSD);
+    [maxCx,maxCk]=max(ColSD);
+    %output the result
+    fprintf('The minimum std among the columns is %7.4f\n',minCx)
+    fprintf('  which occurs in column %2.0f\n',minCk)
+    
+    fprintf('The maximum std among the columns is %7.4f\n',maxCx)
+    fprintf('  which occurs in column %2.0f\n',maxCk)
+    
+    
+% Task 7: Find the max&min of the row stds & where they occur
+    disp('-------------------------------------------------------------------------');
+    disp('Task 7: Find the max&min of the row stds & where they occur');
+    %finding the row std
+    RowSD=std(IMAGE',0,1);
+    %min&max row stds
+    [minRx,minRk]=min(RowSD);
+    [maxRx,maxRk]=max(RowSD);
+    %output the result
+    fprintf('The minimum std among the rows is %7.4f\n',minRx)
+    fprintf('  which occurs in rows %2.0f\n',minRk)
+    
+    fprintf('The maximum std among the columns is %7.4f\n',maxRx)
+    fprintf('  which occurs in column %2.0f\n',maxRk)
+    
+     
+% Task 8: Find %of image between rows & cols with max & min std
+    disp('-------------------------------------------------------------------------');
+    disp('Task 8: Find %of image between rows & cols with max & min std');
+    %finding the area between rows & cols with max & min std
+    rowColMinMaxSDArea=((abs(minCk-maxCk))+1)*((abs(minRk-maxRk))+1);
+    %finding the %of the above area 
+    [m,n]=size(IMAGE);
+    perSDArea=(rowColMinMaxSDArea/(m*n))*100;
+    fprintf('The %% of the area confined between the max & min stds is %5.3f%%\n', perSDArea)
+    
+
+% Task 9: Find the std of the confined image
+    disp('-------------------------------------------------------------------------');
+    disp('Task 9: Find the std of the confined image');
+    %finding confined image
+    confinedImage=IMAGE;
+    G=[minCk,maxCk];
+    confineColumns=sort(G);
+    smallColumn=confineColumns(1);
+    bigColumn=confineColumns(2);
+    H=[minRk,maxRk];
+    confineRows=sort(H);
+    smallRow=confineRows(1);
+    bigRow=confineRows(2);
+    [m,n]=size(confinedImage);
+    confinedImage([1:(smallRow-1),(bigRow+1):m],:)=[];
+    confinedImage(:,[1:(smallColumn-1),(bigColumn+1):n])=[];
+    %finding the std
+    confinedImage1=confinedImage(:);
+    conImageSD=std(confinedImage1,0,1);
+    conImageSD=mean(conImageSD);
+    %output the result
+    fprintf('The std of the confined image is %7.4f\n',conImageSD)
+    
+    
+% Task 10: Find % of area confined between rows & cols with max & min averages
+    disp('-------------------------------------------------------------------------');
+    disp('Task 10: Find % of area confined between rows & cols with max & min avgs');
+        
+    columnAverages=mean(IMAGE);
+    rowAverages=mean(IMAGE');
+        
+    [minColAvgx,minColAvgk]=min(columnAverages);
+    [maxColAvgx,maxColAvgk]=max(columnAverages);
+    [minRowAvgx,minRowAvgk]=min(rowAverages);
+    [maxRowAvgx,maxRowAvgk]=max(rowAverages);
+    
+    rowColMinMaxAvgArea=((abs(minColAvgk-maxColAvgk))+1)*((abs(minRowAvgk-maxRowAvgk))+1);
+    %finding the %of the above area 
+    [m,n]=size(IMAGE);
+    perAvgArea=(rowColMinMaxAvgArea/(m*n))*100;
+    fprintf('The %% of the area confined between the max & min stds is %5.3f%%\n', perAvgArea)
+
+
+% Task 11: Find the std of the area between the averages
+    disp('-------------------------------------------------------------------------');
+    disp('Task 11: Find the std of the area between the averages');
+    %finding confined image
+    areaBetweenAvgs=IMAGE;
+    G=[minColAvgk,maxColAvgk];
+    confineColumnsAvgs=sort(G);
+    smallColumnAvgs=confineColumnsAvgs(1);
+    bigColumnAvgs=confineColumnsAvgs(2);
+    H=[minRowAvgk,maxRowAvgk];
+    confineRowsAvgs=sort(H);
+    smallRowAvgs=confineRowsAvgs(1);
+    bigRowAvgs=confineRowsAvgs(2);
+    [m,n]=size(areaBetweenAvgs);
+    areaBetweenAvgs([1:(smallRowAvgs-1),(bigRowAvgs+1):m],:)=[];
+    areaBetweenAvgs(:,[1:(smallColumnAvgs-1),(bigColumnAvgs+1):n])=[];
+    %finding the std
+    areaBetweenAvgs1=areaBetweenAvgs(:);
+    conImageAvgSD=std(areaBetweenAvgs1,0,1);
+    conImageAvgSD=mean(conImageAvgSD);
+    %output the result
+    fprintf('The std of the confined image is %7.4f\n',conImageAvgSD)
+    
+    
+% Task 12: Plots of Confined images
+    disp('-------------------------------------------------------------------------');
+    disp('Task 12: Plots of Confined images');
+    IMAGE5=IMAGE;
+    IMAGE6=min(IMAGE5);
+    [min2x,min2k]=min(IMAGE6);
+    [m,n]=size(IMAGE5);
+    IMAGE5([1:(smallRowAvgs-1),(bigRowAvgs+1):m],:)=min2x;
+    IMAGE5(:,[1:(smallColumnAvgs-1),(bigColumnAvgs+1):n])=min2x;
+    surf(IMAGE5);
+    colormap gray;
+    colorbar;
+    shading interp;
+    view(0,90);
+    grid on;
+    box off;
+    whitebg=('white');
+    title('Figure 2');
+    xlabel('C o l u m n s');
+    ylabel('R o w s');
+    disp('See Figure 2 for inset plot of area between max & min std, hit any key to continue')
+    pause;
+
+    %plotting the area between max & min std
+    IMAGE3=IMAGE;
+    IMAGE4=min(IMAGE3);
+    [min3x,min3k]=min(IMAGE4);
+    [m,n]=size(IMAGE3);
+    IMAGE3([1:(smallRow-1),(bigRow+1):m],:)=min3x;
+    IMAGE3(:,[1:(smallColumn-1),(bigColumn+1):n])=min3x;
+    surf(IMAGE3);
+    colormap gray;
+    colorbar;
+    shading interp;
+    view(0,90);
+    grid on;
+    box off;
+    whitebg=('white');
+    title('Figure 3');
+    xlabel('C o l u m n s');
+    ylabel('R o w s');
+    disp('See Figure 3 for inset plot of area between max & min std, hit any key to continue')
+    pause;
+    disp('          ');
+    disp('                                 The End                                      ');
+
+     
